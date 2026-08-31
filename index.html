@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dooper Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =====================================================================
+     DOOPER SHOP — DESIGN TOKENS
+     Base:      #FFFDF9 (warm white canvas, not the AI-cliché cream)
+     Ink:       #1A1147 (deep indigo-black — headings, nav)
+     Electronics: #3D5AFE (electric blue)
+     Beauty:      #FF3D8A (hot pink)
+     Education:   #00B88D (mint green)
+     Accent/CTA:  #FFB800 (sunny amber) + #FF5A5F (coral, buy button)
+     Display font: Fredoka (rounded, playful, friendly — matches a
+                   marketplace people want to browse, not a corp dashboard)
+     Body font:    Inter
+     Amharic:      Noto Sans Ethiopic (only font family here that
+                   properly renders Ethiopic script)
+     ===================================================================== */
+  :root{
+    --ink:#1A1147;
+    --paper:#FFFDF9;
+    --paper-dim:#F5F1FF;
+    --electronics:#3D5AFE;
+    --beauty:#FF3D8A;
+    --education:#00B88D;
+    --amber:#FFB800;
+    --coral:#FF5A5F;
+    --line:#E9E4F7;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:90px;
+  }
+  [lang-am]{font-family:'Noto Sans Ethiopic','Inter',sans-serif;}
+  h1,h2,h3,.display{font-family:'Fredoka',sans-serif;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:30;
+    background:var(--ink);
+    color:#fff;
+    padding:16px 18px 14px;
+    border-radius:0 0 22px 22px;
+    box-shadow:0 6px 18px rgba(26,17,71,0.15);
+  }
+  .top-row{display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:38px;height:38px;border-radius:12px;
+    background:linear-gradient(135deg,var(--amber),var(--coral));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px; flex-shrink:0;
+  }
+  .brand-name{font-size:20px; font-weight:600; letter-spacing:0.2px;}
+  .brand-tag{font-size:11.5px; color:#C9C2ED; margin-top:1px;}
+
+  .lang-toggle{
+    display:flex; background:rgba(255,255,255,0.1);
+    border-radius:999px; padding:3px; gap:2px;
+  }
+  .lang-toggle button{
+    border:none; background:transparent; color:#C9C2ED;
+    font-size:12.5px; font-weight:600; padding:6px 11px;
+    border-radius:999px; cursor:pointer; font-family:inherit;
+  }
+  .lang-toggle button.active{background:#fff; color:var(--ink);}
+
+  .search-row{margin-top:14px;}
+  .search-row input{
+    width:100%; padding:11px 14px; border-radius:12px; border:none;
+    font-size:14px; font-family:inherit; background:rgba(255,255,255,0.12);
+    color:#fff;
+  }
+  .search-row input::placeholder{color:#B4ACD9;}
+
+  /* ---------- Category pills ---------- */
+  .cats{
+    display:flex; gap:8px; overflow-x:auto; padding:14px 16px 4px;
+    scrollbar-width:none;
+  }
+  .cats::-webkit-scrollbar{display:none;}
+  .cat-pill{
+    flex:0 0 auto; padding:9px 15px; border-radius:999px;
+    font-size:13.5px; font-weight:600; cursor:pointer;
+    border:1.5px solid var(--line); background:#fff; color:var(--ink);
+    white-space:nowrap;
+  }
+  .cat-pill.active{border-color:transparent; color:#fff;}
+
+  /* ---------- Product grid ---------- */
+  .grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    padding:14px 16px 8px;
+  }
+  .card{
+    background:#fff; border:1.5px solid var(--line); border-radius:var(--radius);
+    overflow:hidden; cursor:pointer; display:flex; flex-direction:column;
+  }
+  .card-img{
+    aspect-ratio:1/0.85; display:flex; align-items:center; justify-content:center;
+    font-size:46px; position:relative;
+  }
+  .card-cat-dot{
+    position:absolute; top:9px; left:9px; font-size:10px; font-weight:700;
+    color:#fff; padding:3px 8px; border-radius:999px; letter-spacing:0.2px;
+  }
+  .card-body{padding:10px 12px 12px;}
+  .card-name{font-size:13.5px; font-weight:600; line-height:1.25; min-height:34px;}
+  .card-price{font-size:14.5px; font-weight:700; margin-top:6px; color:var(--coral);}
+
+  .empty-state{
+    grid-column:1/-1; text-align:center; padding:40px 20px; color:#9A93BE; font-size:14px;
+  }
+
+  /* ---------- Product modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(26,17,71,0.45); z-index:50;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .overlay.open{display:flex;}
+  .sheet{
+    background:#fff; width:100%; max-width:520px; border-radius:24px 24px 0 0;
+    max-height:88vh; overflow-y:auto; padding-bottom:22px;
+    animation:slideUp 0.22s ease-out;
+  }
+  @keyframes slideUp{from{transform:translateY(24px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  .sheet-img{
+    height:200px; display:flex; align-items:center; justify-content:center; font-size:88px;
+    border-radius:24px 24px 0 0;
+  }
+  .sheet-body{padding:18px 20px 4px;}
+  .sheet-close{
+    position:absolute; top:14px; right:16px; background:rgba(0,0,0,0.35); color:#fff;
+    border:none; width:30px; height:30px; border-radius:50%; font-size:16px; cursor:pointer;
+  }
+  .sheet h2{font-size:19px; margin:0 0 6px;}
+  .sheet-desc{font-size:13.5px; color:#5C5480; line-height:1.5; margin-bottom:14px;}
+  .sheet-price{font-size:20px; font-weight:700; color:var(--coral); margin-bottom:16px;}
+
+  .field-label{font-size:12px; font-weight:700; color:#9A93BE; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px;}
+  select.variant-select{
+    width:100%; padding:11px 12px; border-radius:12px; border:1.5px solid var(--line);
+    font-size:14px; font-family:inherit; margin-bottom:16px; background:var(--paper-dim);
+  }
+  .qty-row{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+  .qty-btn{
+    width:34px; height:34px; border-radius:10px; border:1.5px solid var(--line);
+    background:#fff; font-size:17px; font-weight:700; cursor:pointer;
+  }
+  .qty-val{font-size:16px; font-weight:700; min-width:20px; text-align:center;}
+
+  .order-btn{
+    width:100%; padding:15px; border:none; border-radius:14px;
+    background:var(--coral); color:#fff; font-size:15.5px; font-weight:700;
+    font-family:inherit; cursor:pointer;
+  }
+
+  /* ---------- Floating contact button ---------- */
+  .fab{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; border-radius:999px; padding:13px 22px;
+    font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px;
+    box-shadow:0 8px 22px rgba(26,17,71,0.3); cursor:pointer; z-index:20; border:none;
+    font-family:inherit;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-row">
+    <div class="brand">
+      <div class="brand-mark">🛍️</div>
+      <div>
+        <div class="brand-name">Dooper Shop</div>
+        <div class="brand-tag" id="tag-line">Electronics · Beauty · Learning</div>
+      </div>
+    </div>
+    <div class="lang-toggle">
+      <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+      <button id="btn-am" onclick="setLang('am')">አማ</button>
+    </div>
+  </div>
+  <div class="search-row">
+    <input id="search" type="text" placeholder="Search products..." oninput="render()">
+  </div>
+</header>
+
+<div class="cats" id="cats"></div>
+<div class="grid" id="grid"></div>
+
+<div class="overlay" id="overlay" onclick="closeSheetIfBackdrop(event)">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<button class="fab" onclick="contactSeller()">💬 <span id="fab-text">Message the shop</span></button>
+
+<script>
+/* =======================================================================
+   EDIT YOUR PRODUCTS HERE — this is the only section you should need
+   to touch to run the shop day-to-day.
+
+   - price: just a number (Birr). Change it any time.
+   - emoji: shown as the product's picture. To use a REAL PHOTO instead,
+     replace the emoji line with an <img> tag, e.g.:
+       image: '<img src="https://your-image-url.jpg" style="width:100%;height:100%;object-fit:cover">'
+     and it will drop in automatically (see renderVisual() below).
+   - variants: options a buyer can choose (color, size, package, etc).
+     Leave as [] if a product has no choices.
+   - category must be one of: electronics | beauty | education
+   ======================================================================= */
+const PRODUCTS = [
+  {
+    id:'p1', category:'electronics', emoji:'🎧',
+    name_en:'Wireless Earbuds', name_am:'ገመድ አልባ ኢርፎን',
+    desc_en:'Bluetooth earbuds with charging case. Great sound, all-day battery.',
+    desc_am:'ከቻርጅ መያዣ ጋር የብሉቱዝ ኢርፎን። ጥሩ ድምጽ እና ረጅም ባትሪ አገልግሎት።',
+    price:1800, variants:['Black','White']
+  },
+  {
+    id:'p2', category:'electronics', emoji:'🔌',
+    name_en:'Fast Charger + Cable', name_am:'ፈጣን ቻርጀር + ገመድ',
+    desc_en:'20W fast charging adapter with 1m USB-C cable.',
+    desc_am:'20W ፈጣን ቻርጀር ከ1 ሜትር USB-C ገመድ ጋር።',
+    price:950, variants:['Type-C','Micro USB']
+  },
+  {
+    id:'p3', category:'electronics', emoji:'🔋',
+    name_en:'Power Bank 10,000mAh', name_am:'ፓወር ባንክ 10,000mAh',
+    desc_en:'Compact power bank, charges a phone twice on one trip.',
+    desc_am:'ትንሽ ፓወር ባንክ፣ ስልክን ሁለት ጊዜ ሙሉ ቻርጅ ያደርጋል።',
+    price:2200, variants:[]
+  },
+  {
+    id:'p4', category:'beauty', emoji:'💄',
+    name_en:'Matte Lipstick', name_am:'ማት ሊፕስቲክ',
+    desc_en:'Long-lasting matte finish, smooth application.',
+    desc_am:'ረጅም ጊዜ የሚቆይ ማት ውጤት፣ ለስላሳ አጠቃቀም።',
+    price:450, variants:['Red','Nude','Wine']
+  },
+  {
+    id:'p5', category:'beauty', emoji:'🧴',
+    name_en:'Face Serum', name_am:'የፊት ሴረም',
+    desc_en:'Hydrating daily serum for smooth, even skin.',
+    desc_am:'ለስላሳ እና እኩል ቆዳ ለማድረግ የሚረዳ የእለት ሴረም።',
+    price:680, variants:['30ml','50ml']
+  },
+  {
+    id:'p6', category:'beauty', emoji:'💅',
+    name_en:'Nail Polish Set (6pc)', name_am:'የጥፍር ቀለም ስብስብ (6 ቁራጭ)',
+    desc_en:'Six everyday shades in one box.',
+    desc_am:'ስድስት ቀለሞች በአንድ ሳጥን ውስጥ።',
+    price:520, variants:[]
+  },
+  {
+    id:'p7', category:'education', emoji:'📓',
+    name_en:'Notebook (200 pages)', name_am:'ማስታወሻ ደብተር (200 ገጽ)',
+    desc_en:'Thick ruled notebook, hard cover.',
+    desc_am:'ወፍራም መስመር ያለው ማስታወሻ ደብተር፣ ጠንካራ ሽፋን።',
+    price:150, variants:['Ruled','Grid']
+  },
+  {
+    id:'p8', category:'education', emoji:'✏️',
+    name_en:'Pencil & Pen Set', name_am:'እርሳስ እና ብዕር ስብስብ',
+    desc_en:'5 pencils, 3 pens, sharpener, and eraser in one pack.',
+    desc_am:'5 እርሳሶች፣ 3 ብዕሮች፣ መጭመቂያ እና ማጥፊያ በአንድ ጥቅል።',
+    price:220, variants:[]
+  },
+  {
+    id:'p9', category:'education', emoji:'📚',
+    name_en:'Tutoring Session (1 hr)', name_am:'የትምህርት ድጋፍ (1 ሰዓት)',
+    desc_en:'One-on-one help — Math, Physics, or English. Tell us the subject when you order.',
+    desc_am:'የግል የትምህርት ድጋፍ — ሂሳብ፣ ፊዚክስ ወይም እንግሊዝኛ። ስታዙ ትምህርቱን ይንገሩን።',
+    price:300, variants:['Math','Physics','English']
+  }
+];
+
+/* Shop settings */
+const SHOP = {
+  telegram_username: 'skey_dooper'
+};
+
+/* Translated UI strings */
+const I18N = {
+  en:{
+    tagline:'Electronics · Beauty · Learning',
+    search_ph:'Search products...',
+    fab:'Message the shop',
+    all:'All', electronics:'Electronics', beauty:'Beauty', education:'Education',
+    choose:'Choose an option', qty:'Quantity', order:'Order via Telegram',
+    empty:'No products found', birr:'Birr'
+  },
+  am:{
+    tagline:'ኤሌክትሮኒክስ · ውበት · ትምህርት',
+    search_ph:'ምርት ይፈልጉ...',
+    fab:'ሱቁን ያናግሩ',
+    all:'ሁሉም', electronics:'ኤሌክትሮኒክስ', beauty:'ውበት', education:'ትምህርት',
+    choose:'ምርጫ ይምረጡ', qty:'ብዛት', order:'በቴሌግራም ይዘዙ',
+    empty:'ምንም ምርት አልተገኘም', birr:'ብር'
+  }
+};
+
+const CAT_COLOR = {electronics:'var(--electronics)', beauty:'var(--beauty)', education:'var(--education)'};
+
+let lang = 'en';
+let activeCat = 'all';
+let cart = { qty:1, variant:null, product:null };
+
+function t(key){ return I18N[lang][key]; }
+
+function setLang(l){
+  lang = l;
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.getElementById('btn-am').classList.toggle('active', l==='am');
+  document.getElementById('search').placeholder = t('search_ph');
+  document.getElementById('search').setAttribute('lang-am', l==='am' ? '' : null);
+  document.getElementById('tag-line').textContent = t('tagline');
+  document.getElementById('fab-text').textContent = t('fab');
+  document.body.toggleAttribute('lang-am', l==='am');
+  renderCats();
+  render();
+}
+
+function renderCats(){
+  const cats = ['all','electronics','beauty','education'];
+  const el = document.getElementById('cats');
+  el.innerHTML = cats.map(c=>{
+    const isActive = c===activeCat;
+    const bg = c==='all' ? 'var(--ink)' : CAT_COLOR[c];
+    const style = isActive ? `background:${bg};` : '';
+    return `<div class="cat-pill ${isActive?'active':''}" style="${style}" onclick="selectCat('${c}')">${t(c)}</div>`;
+  }).join('');
+}
+
+function selectCat(c){ activeCat = c; renderCats(); render(); }
+
+function renderVisual(p, sizeStyle){
+  // If a product defines a custom `image` (HTML string, e.g. a real <img>), use it.
+  if(p.image) return p.image;
+  return p.emoji;
+}
+
+function render(){
+  const grid = document.getElementById('grid');
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let items = PRODUCTS.filter(p => activeCat==='all' || p.category===activeCat);
+  if(q){
+    items = items.filter(p =>
+      p.name_en.toLowerCase().includes(q) || p.name_am.includes(q)
+    );
+  }
+  if(items.length===0){
+    grid.innerHTML = `<div class="empty-state">${t('empty')}</div>`;
+    return;
+  }
+  grid.innerHTML = items.map(p=>{
+    const name = lang==='en' ? p.name_en : p.name_am;
+    return `
+    <div class="card" onclick="openSheet('${p.id}')">
+      <div class="card-img" style="background:${CAT_COLOR[p.category]}18;">
+        <div class="card-cat-dot" style="background:${CAT_COLOR[p.category]}">${t(p.category)}</div>
+        ${renderVisual(p)}
+      </div>
+      <div class="card-body">
+        <div class="card-name" ${lang==='am'?'lang-am':''}>${name}</div>
+        <div class="card-price">${p.price.toLocaleString()} ${t('birr')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSheet(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  cart = { qty:1, variant: p.variants[0] || null, product:p };
+  const name = lang==='en' ? p.name_en : p.name_am;
+  const desc = lang==='en' ? p.desc_en : p.desc_am;
+
+  const variantHtml = p.variants.length ? `
+    <div class="field-label">${t('choose')}</div>
+    <select class="variant-select" onchange="cart.variant=this.value">
+      ${p.variants.map(v=>`<option value="${v}">${v}</option>`).join('')}
+    </select>` : '';
+
+  document.getElementById('sheet').innerHTML = `
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+    <div class="sheet-img" style="background:${CAT_COLOR[p.category]}18;">${renderVisual(p)}</div>
+    <div class="sheet-body">
+      <h2 ${lang==='am'?'lang-am':''}>${name}</h2>
+      <div class="sheet-desc" ${lang==='am'?'lang-am':''}>${desc}</div>
+      <div class="sheet-price">${p.price.toLocaleString()} ${t('birr')}</div>
+      ${variantHtml}
+      <div class="field-label">${t('qty')}</div>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-val" id="qty-val">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <button class="order-btn" style="background:${CAT_COLOR[p.category]}" onclick="orderProduct()">${t('order')}</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function changeQty(delta){
+  cart.qty = Math.max(1, cart.qty + delta);
+  document.getElementById('qty-val').textContent = cart.qty;
+}
+
+function closeSheet(){ document.getElementById('overlay').classList.remove('open'); }
+function closeSheetIfBackdrop(e){ if(e.target.id==='overlay') closeSheet(); }
+
+function orderProduct(){
+  const p = cart.product;
+  const name = lang==='en' ? p.name_en : p.name_am;
+  let msg = `Hi! I'd like to order:\n${name}`;
+  if(cart.variant) msg += ` (${cart.variant})`;
+  msg += ` x${cart.qty}\nTotal: ${(p.price*cart.qty).toLocaleString()} Birr`;
+  openTelegramOrder(msg);
+}
+
+function contactSeller(){
+  openTelegramOrder("Hi! I have a question about your shop.");
+}
+
+function openTelegramOrder(text){
+  const url = `https://t.me/${SHOP.telegram_username}?text=${encodeURIComponent(text)}`;
+  if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink){
+    window.Telegram.WebApp.openTelegramLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+/* Init */
+if(window.Telegram && window.Telegram.WebApp){ window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
+renderCats();
+render();
+</script>
+</body>
+</html>
