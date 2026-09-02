@@ -1,658 +1,705 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Campus Shop | ካምፓስ ሱቅ</title>
-<style>
-  :root{
-    --primary:#0b6e4f;
-    --primary-dark:#084d38;
-    --accent:#d4a017;
-    --bg:#f6f7f5;
-    --card:#ffffff;
-    --text:#1f2a24;
-    --muted:#6b7570;
-    --danger:#c0392b;
-    --radius:14px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{
-    font-family:'Segoe UI',Tahoma,Arial,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding-bottom:60px;
-  }
-  header{
-    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-    color:#fff;
-    padding:18px 16px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:10px;
-    position:sticky;
-    top:0;
-    z-index:50;
-    box-shadow:0 2px 10px rgba(0,0,0,.15);
-  }
-  header .brand{display:flex;align-items:center;gap:10px;}
-  header .brand h1{font-size:1.25rem;}
-  header .brand span{font-size:1.6rem;}
-  .top-actions{display:flex;gap:8px;flex-wrap:wrap;}
-  button{
-    cursor:pointer;
-    border:none;
-    border-radius:8px;
-    font-size:.9rem;
-    padding:8px 12px;
-    font-weight:600;
-    transition:transform .15s ease, opacity .15s ease;
-  }
-  button:active{transform:scale(.96);}
-  .btn-light{background:#fff;color:var(--primary-dark);}
-  .btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);}
-  .btn-gold{background:var(--accent);color:#2b2100;}
-  .btn-danger{background:var(--danger);color:#fff;}
-  .btn-primary{background:var(--primary);color:#fff;}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkyShop Ethiopia</title>
+    <!-- Font Awesome (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --green: #1a8a4a;
+            --green-dark: #136035;
+            --green-light: #e8f5ee;
+            --yellow: #fcd116;
+            --red: #ef4135;
+            --gold: #f5a623;
+            --bg: #f4f7f9;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+            --radius: 16px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  .search-wrap{padding:14px 16px 0;}
-  .search-wrap input{
-    width:100%;
-    padding:12px 14px;
-    border-radius:10px;
-    border:1px solid #d9ddd9;
-    font-size:1rem;
-  }
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: #1e2a3a;
+            line-height: 1.6;
+            transition: background 0.3s;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+        }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            outline: none;
+            background: none;
+        }
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+            outline: none;
+            border: 1px solid #d0d7de;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: border 0.2s;
+            background: #fff;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(26, 138, 74, 0.15);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-  nav.categories{
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
-    padding:14px 16px;
-  }
-  nav.categories button{
-    background:#fff;
-    border:1px solid #d9ddd9;
-    color:var(--text);
-    white-space:nowrap;
-  }
-  nav.categories button.active{
-    background:var(--primary);
-    color:#fff;
-    border-color:var(--primary);
-  }
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #eaeef3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--green);
+            border-radius: 10px;
+        }
 
-  main{
-    padding:6px 16px 30px;
-  }
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-    gap:14px;
-  }
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    overflow:hidden;
-    box-shadow:0 2px 8px rgba(0,0,0,.06);
-    display:flex;
-    flex-direction:column;
-  }
-  .card .img{
-    height:120px;
-    background:#eef3ef;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:2.6rem;
-    overflow:hidden;
-  }
-  .card .img img{width:100%;height:100%;object-fit:cover;}
-  .card .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1;}
-  .card .name{font-weight:700;font-size:.95rem;line-height:1.25;}
-  .card .desc{font-size:.8rem;color:var(--muted);flex:1;}
-  .card .price{font-weight:700;color:var(--primary-dark);font-size:1rem;}
-  .card .buy{
-    background:#229ED9;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-  }
-  .empty{
-    text-align:center;
-    padding:40px 10px;
-    color:var(--muted);
-  }
+        /* ===== HEADER ===== */
+        header {
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%);
+            color: #fff;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-area i {
+            font-size: 2rem;
+            color: var(--yellow);
+        }
+        .logo-area h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .logo-area h1 span {
+            color: var(--yellow);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.03);
+        }
+        .lang-btn i {
+            font-size: 0.9rem;
+        }
+        .cart-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .cart-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.03);
+        }
+        .cart-badge {
+            background: var(--red);
+            color: #fff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            border: 2px solid var(--green);
+        }
+        .admin-shortcut {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+        .admin-shortcut:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
 
-  /* Modal */
-  .modal-overlay{
-    display:none;
-    position:fixed;inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:100;
-    align-items:flex-start;
-    justify-content:center;
-    padding:20px;
-    overflow-y:auto;
-  }
-  .modal-overlay.show{display:flex;}
-  .modal{
-    background:#fff;
-    border-radius:var(--radius);
-    width:100%;
-    max-width:520px;
-    padding:20px;
-    margin-top:20px;
-  }
-  .modal h2{margin-bottom:14px;color:var(--primary-dark);}
-  .modal label{display:block;font-size:.85rem;font-weight:600;margin:10px 0 4px;}
-  .modal input, .modal select, .modal textarea{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #d9ddd9;
-    font-size:.9rem;
-  }
-  .modal textarea{resize:vertical;min-height:60px;}
-  .modal .row{display:flex;gap:10px;}
-  .modal .row > div{flex:1;}
-  .modal .close-x{
-    float:right;
-    background:transparent;
-    color:var(--muted);
-    font-size:1.2rem;
-  }
-  .admin-list-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    border:1px solid #eee;
-    border-radius:10px;
-    padding:8px;
-    margin-bottom:8px;
-  }
-  .admin-list-item .thumb{
-    width:44px;height:44px;border-radius:8px;background:#eef3ef;
-    display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;
-  }
-  .admin-list-item .info{flex:1;min-width:0;}
-  .admin-list-item .info b{display:block;font-size:.85rem;}
-  .admin-list-item .info small{color:var(--muted);}
-  .admin-list-item .actions{display:flex;gap:6px;}
-  .admin-list-item .actions button{padding:6px 8px;font-size:.75rem;}
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--green-light) 0%, #d4edda 100%);
+            padding: 40px 0 30px;
+            border-bottom: 4px solid var(--yellow);
+            text-align: center;
+        }
+        .hero h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--green-dark);
+            margin-bottom: 4px;
+        }
+        .hero h2 i {
+            color: var(--gold);
+            margin: 0 6px;
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: #2d4a3e;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .hero .tag {
+            display: inline-block;
+            background: var(--yellow);
+            color: #1e2a3a;
+            padding: 4px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: 0.3px;
+        }
 
-  .hint{
-    background:#fff8e1;
-    border:1px solid #e6d183;
-    border-radius:10px;
-    padding:10px;
-    font-size:.8rem;
-    color:#5a4a00;
-    margin:10px 0;
-    line-height:1.4;
-  }
-  #exportBox{
-    width:100%;
-    min-height:160px;
-    font-family:monospace;
-    font-size:.75rem;
-    margin-top:8px;
-  }
-  .tabs{display:flex;gap:6px;margin-bottom:12px;}
-  .tabs button{flex:1;background:#eef1ee;color:var(--text);}
-  .tabs button.active{background:var(--primary);color:#fff;}
-  .tab-panel{display:none;}
-  .tab-panel.active{display:block;}
-</style>
-</head>
-<body>
+        /* ===== CATEGORY TABS ===== */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px 0 10px;
+        }
+        .category-tabs button {
+            padding: 10px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: #fff;
+            color: #2d4a3e;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 2px solid transparent;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-tabs button i {
+            font-size: 1rem;
+        }
+        .category-tabs button:hover {
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+        .category-tabs button.active {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green);
+            box-shadow: 0 4px 14px rgba(26, 138, 74, 0.3);
+        }
 
-<header>
-  <div class="brand">
-    <span>🎓</span>
-    <h1 data-t="siteTitle">Campus Shop</h1>
-  </div>
-  <div class="top-actions">
-    <button class="btn-outline" id="langBtn">አማ / EN</button>
-    <button class="btn-gold" id="adminOpenBtn" data-t="adminBtn">Admin</button>
-  </div>
-</header>
+        /* ===== PRODUCT GRID ===== */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+            padding: 20px 0 40px;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+        }
+        .product-img {
+            height: 190px;
+            background: #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-img .no-img {
+            color: #aab;
+            font-size: 2.4rem;
+            opacity: 0.3;
+        }
+        .product-body {
+            padding: 16px 18px 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-body .cat-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--green);
+            background: var(--green-light);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            align-self: flex-start;
+            margin-bottom: 6px;
+        }
+        .product-body h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .product-body .price {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--green-dark);
+            margin: 4px 0 6px;
+        }
+        .product-body .price span {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: #6b7a8a;
+        }
+        .product-body .desc {
+            font-size: 0.85rem;
+            color: #4a5a6a;
+            flex: 1;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .product-body .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+        .product-body .actions button {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-add {
+            background: var(--green);
+            color: #fff;
+        }
+        .btn-add:hover {
+            background: var(--green-dark);
+            transform: scale(1.02);
+        }
+        .btn-buy {
+            background: var(--yellow);
+            color: #1e2a3a;
+        }
+        .btn-buy:hover {
+            background: #e6b800;
+            transform: scale(1.02);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--green);
+            border: 2px solid var(--green);
+        }
+        .btn-outline:hover {
+            background: var(--green);
+            color: #fff;
+        }
 
-<div class="search-wrap">
-  <input type="text" id="searchInput" data-t-ph="searchPh" placeholder="Search products...">
-</div>
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7a8a;
+        }
+        .empty-state i {
+            font-size: 3.5rem;
+            opacity: 0.3;
+            margin-bottom: 12px;
+        }
+        .empty-state p {
+            font-size: 1.1rem;
+        }
 
-<nav class="categories" id="categoryNav"></nav>
+        /* ===== CART SIDEBAR ===== */
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        .cart-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            max-width: 92vw;
+            height: 100vh;
+            background: #fff;
+            z-index: 201;
+            padding: 24px 20px;
+            overflow-y: auto;
+            transform: translateX(105%);
+            transition: var(--transition);
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+        .cart-sidebar .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #eef2f7;
+            margin-bottom: 16px;
+        }
+        .cart-sidebar .cart-header h2 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-sidebar .cart-header .close-btn {
+            font-size: 1.5rem;
+            color: #6b7a8a;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .cart-sidebar .cart-header .close-btn:hover {
+            background: #f0f2f5;
+            color: #1e2a3a;
+        }
+        .cart-item {
+            display: flex;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            align-items: center;
+        }
+        .cart-item img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #f0f4f8;
+        }
+        .cart-item-info {
+            flex: 1;
+        }
+        .cart-item-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .cart-item-info .cart-price {
+            font-weight: 700;
+            color: var(--green-dark);
+            font-size: 0.9rem;
+        }
+        .cart-item .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-item .qty-control button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #eef2f7;
+            font-weight: 700;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        .cart-item .qty-control button:hover {
+            background: var(--green);
+            color: #fff;
+        }
+        .cart-item .qty-control span {
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+        .cart-item .remove-item {
+            color: #b0b8c4;
+            transition: var(--transition);
+            font-size: 1rem;
+            padding: 4px;
+        }
+        .cart-item .remove-item:hover {
+            color: var(--red);
+        }
+        .cart-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 2px solid #eef2f7;
+        }
+        .cart-footer .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+        .cart-footer .total-row span:last-child {
+            color: var(--green-dark);
+        }
+        .cart-footer .checkout-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--green);
+            color: #fff;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .cart-footer .checkout-btn:hover {
+            background: var(--green-dark);
+            transform: scale(1.01);
+        }
+        .cart-footer .telegram-contact {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #4a5a6a;
+            background: #f0f7fe;
+            padding: 8px 12px;
+            border-radius: 30px;
+        }
+        .cart-footer .telegram-contact i {
+            color: #0088cc;
+        }
+        .cart-footer .telegram-contact strong {
+            color: var(--green-dark);
+        }
 
-<main>
-  <div class="grid" id="productGrid"></div>
-  <div class="empty" id="emptyMsg" style="display:none;" data-t="noResults">No products found.</div>
-</main>
+        /* ===== ADMIN ===== */
+        .admin-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        .admin-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .admin-modal {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            width: 440px;
+            max-width: 94vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.92);
+            transition: var(--transition);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+        }
+        .admin-overlay.open .admin-modal {
+            transform: scale(1);
+        }
+        .admin-modal h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--green-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .admin-modal .pwd-input {
+            margin-bottom: 16px;
+        }
+        .admin-modal .pwd-input label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+        .admin-modal .pwd-input input {
+            padding: 12px 16px;
+        }
+        .admin-modal .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .admin-modal .admin-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--green-dark);
+        }
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #c92a1f;
+        }
+        .btn-secondary {
+            background: #eef2f7;
+            color: #1e2a3a;
+        }
+        .btn-secondary:hover {
+            background: #dce1e8;
+        }
 
-<!-- ADMIN LOGIN MODAL -->
-<div class="modal-overlay" id="loginOverlay">
-  <div class="modal">
-    <button class="close-x" onclick="closeModal('loginOverlay')">✕</button>
-    <h2 data-t="adminLogin">Admin Login</h2>
-    <label data-t="passwordLabel">Password</label>
-    <input type="password" id="passwordInput" placeholder="••••••••">
-    <p id="loginError" style="color:#c0392b;font-size:.8rem;margin-top:6px;display:none;" data-t="wrongPass">Incorrect password.</p>
-    <button class="btn-primary" style="margin-top:14px;width:100%;" onclick="tryLogin()" data-t="loginBtn">Login</button>
-  </div>
-</div>
-
-<!-- ADMIN PANEL MODAL -->
-<div class="modal-overlay" id="adminOverlay">
-  <div class="modal" style="max-width:640px;">
-    <button class="close-x" onclick="closeModal('adminOverlay')">✕</button>
-    <h2 data-t="adminPanel">Admin Panel</h2>
-
-    <div class="tabs">
-      <button class="active" id="tabManageBtn" onclick="switchTab('manage')" data-t="manageProducts">Manage Products</button>
-      <button id="tabAddBtn" onclick="switchTab('add')" data-t="addNew">Add New</button>
-      <button id="tabExportBtn" onclick="switchTab('export')" data-t="publish">Publish</button>
-    </div>
-
-    <div class="tab-panel active" id="tab-manage">
-      <div id="adminList"></div>
-    </div>
-
-    <div class="tab-panel" id="tab-add">
-      <form id="productForm" onsubmit="saveProduct(event)">
-        <input type="hidden" id="editId">
-        <label data-t="category">Category</label>
-        <select id="f_category">
-          <option value="education">Educational Material</option>
-          <option value="cosmetics">Cosmetics & Beauty</option>
-          <option value="electronics">Electronics</option>
-        </select>
-
-        <div class="row">
-          <div>
-            <label data-t="nameEn">Name (English)</label>
-            <input type="text" id="f_nameEn" required>
-          </div>
-          <div>
-            <label data-t="nameAm">Name (Amharic)</label>
-            <input type="text" id="f_nameAm">
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <label data-t="descEn">Description (English)</label>
-            <textarea id="f_descEn"></textarea>
-          </div>
-          <div>
-            <label data-t="descAm">Description (Amharic)</label>
-            <textarea id="f_descAm"></textarea>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <label data-t="priceLabel">Price (ETB)</label>
-            <input type="number" id="f_price" required min="0">
-          </div>
-          <div>
-            <label data-t="imgLabel">Image URL (optional)</label>
-            <input type="text" id="f_image" placeholder="https://...">
-          </div>
-        </div>
-
-        <button type="submit" class="btn-primary" style="width:100%;margin-top:14px;" data-t="saveProduct">Save Product</button>
-      </form>
-    </div>
-
-    <div class="tab-panel" id="tab-export">
-      <div class="hint" data-t="publishHint">
-        GitHub Pages can't save changes to a server automatically. To make your edits visible to ALL visitors: click "Generate Code" below, copy the text, open your HTML file in GitHub, replace the block that starts with "const defaultProducts = [" down to its closing "];", paste this in instead, then commit the change. Within a minute or two your live site updates for everyone.
-      </div>
-      <button class="btn-gold" onclick="generateExport()" data-t="generateCode">Generate Code</button>
-      <textarea id="exportBox" readonly></textarea>
-    </div>
-
-    <button class="btn-outline" style="background:var(--danger);color:#fff;width:100%;margin-top:16px;" onclick="logoutAdmin()" data-t="logout">Log Out</button>
-  </div>
-</div>
-
-<script>
-/* ===================== DATA ===================== */
-const ADMIN_PASSWORD = "281888$";
-const TELEGRAM_USERNAME = "sky_dooper";
-
-// EDIT THIS ARRAY (via Admin > Publish > Generate Code, then paste back here) to permanently
-// change what every visitor sees.
-const defaultProducts = [
-  {id:1, category:"education", nameEn:"Scientific Calculator", nameAm:"ሳይንሳዊ ካልኩሌተር",
-   descEn:"Casio-style scientific calculator, ideal for engineering & science courses.",
-   descAm:"ለምህንድስናና ለሳይንስ ትምህርቶች የሚሆን ካልኩሌተር።",
-   price:850, image:"", emoji:"🧮"},
-  {id:2, category:"education", nameEn:"Engineering Drawing Set", nameAm:"የምህንድስና ስዕል መሳሪያ ስብስብ",
-   descEn:"Complete drafting set: compass, rulers, set squares.",
-   descAm:"ኮምፓስ፣ መስመሪያ እና ትሪያንግል የያዘ ሙሉ ስብስብ።",
-   price:600, image:"", emoji:"📐"},
-  {id:3, category:"education", nameEn:"A4 Notebook Pack (5pcs)", nameAm:"ኤ4 ማስታወሻ ደብተር (5 ፓክ)",
-   descEn:"Pack of 5 ruled notebooks, 80 pages each.",
-   descAm:"5 ማስታወሻ ደብተሮች፣ እያንዳንዳቸው 80 ገጽ ያላቸው።",
-   price:400, image:"", emoji:"📓"},
-  {id:4, category:"cosmetics", nameEn:"Vaseline Body Lotion", nameAm:"ቫዝሊን የሰውነት ሎሽን",
-   descEn:"400ml moisturizing lotion for daily skin care.",
-   descAm:"400ሚሊ ሊትር ቆዳን የሚያለሰልስ ሎሽን።",
-   price:280, image:"", emoji:"🧴"},
-  {id:5, category:"cosmetics", nameEn:"Facial Cleanser", nameAm:"የፊት ማጽጃ",
-   descEn:"Gentle daily face wash for all skin types.",
-   descAm:"ለሁሉም የቆዳ አይነት የሚሆን ገር የፊት ማጽጃ።",
-   price:320, image:"", emoji:"🧼"},
-  {id:6, category:"cosmetics", nameEn:"Perfume Body Spray", nameAm:"ሽቶ ስፕሬይ",
-   descEn:"Long-lasting fragrance body spray, 150ml.",
-   descAm:"ረዥም ጊዜ የሚቆይ መዓዛ ያለው ስፕሬይ፣ 150ሚሊ ሊትር።",
-   price:450, image:"", emoji:"💐"},
-  {id:7, category:"electronics", nameEn:"32GB USB Flash Drive", nameAm:"32ጂቢ ፍላሽ ዲስክ",
-   descEn:"Reliable USB 3.0 flash drive for storing files & documents.",
-   descAm:"ፋይሎችን ለማስቀመጥ የሚያገለግል 32ጂቢ ፍላሽ ዲስክ።",
-   price:480, image:"", emoji:"💾"},
-  {id:8, category:"electronics", nameEn:"Wired Earphones", nameAm:"ገመድ ያለው ኢርፎን",
-   descEn:"In-ear wired earphones with built-in mic.",
-   descAm:"ማይክራፎን ያለው ገመድ ኢርፎን።",
-   price:350, image:"", emoji:"🎧"},
-  {id:9, category:"electronics", nameEn:"Power Bank 10000mAh", nameAm:"ፓወር ባንክ 10000mAh",
-   descEn:"Portable charger, charges phones 2-3 times fully.",
-   descAm:"ተንቀሳቃሽ ቻርጀር፣ ስልክ 2-3 ጊዜ ሙሉ ለሙሉ ይሞላል።",
-   price:1200, image:"", emoji:"🔋"}
-];
-
-/* ===================== STATE ===================== */
-let products = loadProducts();
-let currentLang = localStorage.getItem("shop_lang") || "en";
-let currentCategory = "all";
-let searchQuery = "";
-
-function loadProducts(){
-  const saved = localStorage.getItem("shop_products");
-  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultProducts));
-}
-function persist(){
-  localStorage.setItem("shop_products", JSON.stringify(products));
-}
-
-/* ===================== TRANSLATIONS ===================== */
-const T = {
-  en:{
-    siteTitle:"Campus Shop", adminBtn:"Admin", searchPh:"Search products...",
-    all:"All", education:"Educational", cosmetics:"Cosmetics & Beauty", electronics:"Electronics",
-    buy:"Buy on Telegram", noResults:"No products found.",
-    adminLogin:"Admin Login", passwordLabel:"Password", wrongPass:"Incorrect password.", loginBtn:"Login",
-    adminPanel:"Admin Panel", manageProducts:"Manage Products", addNew:"Add New", publish:"Publish",
-    category:"Category", nameEn:"Name (English)", nameAm:"Name (Amharic)",
-    descEn:"Description (English)", descAm:"Description (Amharic)",
-    priceLabel:"Price (ETB)", imgLabel:"Image URL (optional)", saveProduct:"Save Product",
-    publishHint:"GitHub Pages can't save changes to a server automatically. To make your edits visible to ALL visitors: click \"Generate Code\" below, copy the text, open your HTML file in GitHub, replace the block that starts with \"const defaultProducts = [\" down to its closing \"];\", paste this in instead, then commit the change. Within a minute or two your live site updates for everyone.",
-    generateCode:"Generate Code", logout:"Log Out", edit:"Edit", delete:"Delete", etb:"ETB"
-  },
-  am:{
-    siteTitle:"ካምፓስ ሱቅ", adminBtn:"አድሚን", searchPh:"እቃ ፈልግ...",
-    all:"ሁሉም", education:"የትምህርት እቃዎች", cosmetics:"ኮስሜቲክስ እና ውበት", electronics:"ኤሌክትሮኒክስ",
-    buy:"በቴሌግራም ይግዙ", noResults:"ምንም እቃ አልተገኘም።",
-    adminLogin:"አድሚን መግቢያ", passwordLabel:"የይለፍ ቃል", wrongPass:"የተሳሳተ የይለፍ ቃል።", loginBtn:"ግባ",
-    adminPanel:"አድሚን ገጽ", manageProducts:"እቃዎችን ያስተዳድሩ", addNew:"አዲስ ጨምር", publish:"አትም",
-    category:"ምድብ", nameEn:"ስም (እንግሊዝኛ)", nameAm:"ስም (አማርኛ)",
-    descEn:"መግለጫ (እንግሊዝኛ)", descAm:"መግለጫ (አማርኛ)",
-    priceLabel:"ዋጋ (ብር)", imgLabel:"የምስል ሊንክ (አማራጭ)", saveProduct:"እቃ አስቀምጥ",
-    publishHint:"ጊትሀብ ፔጅስ ለውጦችን በራስ-ሰር ወደ ሰርቨር ማስቀመጥ አይችልም። ለውጦችዎ ለሁሉም ጎብኝዎች እንዲታዩ፦ ከታች 'Generate Code' የሚለውን ይጫኑ፣ ጽሁፉን ይቅዱ፣ የHTML ፋይልዎን በጊትሀብ ይክፈቱ፣ 'const defaultProducts = [' ብሎ የሚጀምረውን ክፍል እስከ መጨረሻ '];' ድረስ በዚህ ይተኩ፣ ከዚያም ለውጡን ያስቀምጡ (commit)። በደቂቃዎች ውስጥ ገጽዎ ለሁሉም ይዘምናል።",
-    generateCode:"ኮድ አመንጭ", logout:"ውጣ", edit:"አርም", delete:"ሰርዝ", etb:"ብር"
-  }
-};
-
-function tr(key){ return T[currentLang][key] || key; }
-
-/* ===================== RENDER ===================== */
-function applyStaticTranslations(){
-  document.querySelectorAll("[data-t]").forEach(el=>{
-    el.textContent = tr(el.getAttribute("data-t"));
-  });
-  document.querySelectorAll("[data-t-ph]").forEach(el=>{
-    el.placeholder = tr(el.getAttribute("data-t-ph"));
-  });
-}
-
-function renderCategoryNav(){
-  const cats = [
-    {key:"all", label:tr("all")},
-    {key:"education", label:tr("education")},
-    {key:"cosmetics", label:tr("cosmetics")},
-    {key:"electronics", label:tr("electronics")}
-  ];
-  const nav = document.getElementById("categoryNav");
-  nav.innerHTML = "";
-  cats.forEach(c=>{
-    const btn = document.createElement("button");
-    btn.textContent = c.label;
-    if(c.key === currentCategory) btn.classList.add("active");
-    btn.onclick = ()=>{ currentCategory = c.key; renderAll(); };
-    nav.appendChild(btn);
-  });
-}
-
-function renderProducts(){
-  const grid = document.getElementById("productGrid");
-  const emptyMsg = document.getElementById("emptyMsg");
-  grid.innerHTML = "";
-
-  let list = products.filter(p => currentCategory === "all" || p.category === currentCategory);
-  if(searchQuery.trim() !== ""){
-    const q = searchQuery.toLowerCase();
-    list = list.filter(p =>
-      (p.nameEn||"").toLowerCase().includes(q) ||
-      (p.nameAm||"").toLowerCase().includes(q)
-    );
-  }
-
-  if(list.length === 0){
-    emptyMsg.style.display = "block";
-    return;
-  }
-  emptyMsg.style.display = "none";
-
-  list.forEach(p=>{
-    const name = currentLang === "en" ? (p.nameEn || p.nameAm) : (p.nameAm || p.nameEn);
-    const desc = currentLang === "en" ? (p.descEn || p.descAm) : (p.descAm || p.descEn);
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const imgHtml = p.image
-      ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(name)}">`
-      : (p.emoji || "🛍️");
-
-    card.innerHTML = `
-      <div class="img">${imgHtml}</div>
-      <div class="body">
-        <div class="name">${escapeHtml(name)}</div>
-        <div class="desc">${escapeHtml(desc || "")}</div>
-        <div class="price">${p.price} ${tr("etb")}</div>
-        <button class="buy" onclick="buyProduct(${p.id})">✈️ ${tr("buy")}</button>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-function renderAll(){
-  applyStaticTranslations();
-  renderCategoryNav();
-  renderProducts();
-}
-
-function escapeHtml(str){
-  const d = document.createElement("div");
-  d.textContent = str || "";
-  return d.innerHTML;
-}
-
-/* ===================== SEARCH ===================== */
-document.getElementById("searchInput").addEventListener("input", e=>{
-  searchQuery = e.target.value;
-  renderProducts();
-});
-
-/* ===================== LANGUAGE ===================== */
-document.getElementById("langBtn").addEventListener("click", ()=>{
-  currentLang = currentLang === "en" ? "am" : "en";
-  localStorage.setItem("shop_lang", currentLang);
-  renderAll();
-});
-
-/* ===================== TELEGRAM PURCHASE ===================== */
-function buyProduct(id){
-  const p = products.find(x => x.id === id);
-  if(!p) return;
-  const name = currentLang === "en" ? (p.nameEn || p.nameAm) : (p.nameAm || p.nameEn);
-  const msg = encodeURIComponent(`Hi, I want to buy: ${name} (${p.price} ETB)`);
-  window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, "_blank");
-}
-
-/* ===================== ADMIN: LOGIN ===================== */
-let isAdmin = false;
-
-document.getElementById("adminOpenBtn").addEventListener("click", ()=>{
-  if(isAdmin){
-    openModal("adminOverlay");
-    renderAdminList();
-  } else {
-    document.getElementById("passwordInput").value = "";
-    document.getElementById("loginError").style.display = "none";
-    openModal("loginOverlay");
-  }
-});
-
-function tryLogin(){
-  const val = document.getElementById("passwordInput").value;
-  if(val === ADMIN_PASSWORD){
-    isAdmin = true;
-    closeModal("loginOverlay");
-    openModal("adminOverlay");
-    renderAdminList();
-  } else {
-    document.getElementById("loginError").style.display = "block";
-  }
-}
-
-function logoutAdmin(){
-  isAdmin = false;
-  closeModal("adminOverlay");
-}
-
-function openModal(id){ document.getElementById(id).classList.add("show"); }
-function closeModal(id){ document.getElementById(id).classList.remove("show"); }
-
-/* ===================== ADMIN: TABS ===================== */
-function switchTab(tab){
-  ["manage","add","export"].forEach(t=>{
-    document.getElementById("tab-"+t).classList.toggle("active", t===tab);
-  });
-  document.getElementById("tabManageBtn").classList.toggle("active", tab==="manage");
-  document.getElementById("tabAddBtn").classList.toggle("active", tab==="add");
-  document.getElementById("tabExportBtn").classList.toggle("active", tab==="export");
-  if(tab === "add"){
-    document.getElementById("editId").value = "";
-    document.getElementById("productForm").reset();
-  }
-}
-
-/* ===================== ADMIN: MANAGE LIST ===================== */
-function renderAdminList(){
-  const list = document.getElementById("adminList");
-  list.innerHTML = "";
-  products.forEach(p=>{
-    const item = document.createElement("div");
-    item.className = "admin-list-item";
-    const thumb = p.image ? `<img src="${escapeHtml(p.image)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : (p.emoji||"🛍️");
-    item.innerHTML = `
-      <div class="thumb">${thumb}</div>
-      <div class="info">
-        <b>${escapeHtml(p.nameEn)}</b>
-        <small>${p.category} • ${p.price} ETB</small>
-      </div>
-      <div class="actions">
-        <button class="btn-primary" onclick="editProduct(${p.id})">${tr("edit")}</button>
-        <button class="btn-danger" onclick="deleteProduct(${p.id})">${tr("delete")}</button>
-      </div>
-    `;
-    list.appendChild(item);
-  });
-}
-
-function editProduct(id){
-  const p = products.find(x=>x.id===id);
-  if(!p) return;
-  document.getElementById("editId").value = p.id;
-  document.getElementById("f_category").value = p.category;
-  document.getElementById("f_nameEn").value = p.nameEn || "";
-  document.getElementById("f_nameAm").value = p.nameAm || "";
-  document.getElementById("f_descEn").value = p.descEn || "";
-  document.getElementById("f_descAm").value = p.descAm || "";
-  document.getElementById("f_price").value = p.price;
-  document.getElementById("f_image").value = p.image || "";
-  switchTab("add");
-}
-
-function deleteProduct(id){
-  if(!confirm("Delete this product?")) return;
-  products = products.filter(x=>x.id!==id);
-  persist();
-  renderAdminList();
-  renderProducts();
-}
-
-function saveProduct(e){
-  e.preventDefault();
-  const idVal = document.getElementById("editId").value;
-  const data = {
-    category: document.getElementById("f_category").value,
-    nameEn: document.getElementById("f_nameEn").value.trim(),
-    nameAm: document.getElementById("f_nameAm").value.trim(),
-    descEn: document.getElementById("f_descEn").value.trim(),
-    descAm: document.getElementById("f_descAm").value.trim(),
-    price: parseFloat(document.getElementById("f_price").value),
-    image: document.getElementById("f_image").value.trim(),
-    emoji: "🛍️"
-  };
-
-  if(idVal){
-    const p = products.find(x=>x.id === parseInt(idVal));
-    Object.assign(p, data);
-  } else {
-    const newId = products.length ? Math.max(...products.map(p=>p.id)) + 1 : 1;
-    products.push({id:newId, ...data});
-  }
-  persist();
-  document.getElementById("productForm").reset();
-  document.getElementById("editId").value = "";
-  switchTab("manage");
-  renderAdminList();
-  renderProducts();
-}
-
-/* ===================== ADMIN: EXPORT/PUBLISH ===================== */
-function generateExport(){
-  let code = "const defaultProducts = [\n";
-  products.forEach((p,i)=>{
-    code += `  {id:${p.id}, category:"${p.category}", nameEn:${JSON.stringify(p.nameEn)}, nameAm:${JSON.stringify(p.nameAm)},\n`;
-    code += `   descEn:${JSON.stringify(p.descEn)},\n`;
-    code += `   descAm:${JSON.stringify(p.descAm)},\n`;
-    code += `   price:${p.price}, image:${JSON.stringify(p.image||"")}, emoji:${JSON.stringify(p.emoji||"🛍️")}}${i < products.length-1 ? "," : ""}\n`;
-  });
-  code += "];";
-  document.getElementById("exportBox").value = code;
-}
-
-/* ===================== INIT ===================== */
-renderAll();
-</script>
-</body>
-</html>
+        /* ===== ADMIN DASHBOARD ===== */
+        .admin-dash {
+            display: none;
+            padding: 24px 0 40px;
+        }
+        .admin-dash.active {
+            display: block;
+        }
+        .admin-dash .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .admin-dash .dash-header h2 {
+            font-size: 1.5rem;
+            color: var(--green-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-dash .dash-header .admin-actions-top {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .admin-dash .dash-header .admin-actions-top button {
+            padding: 8px 20px;
+      
